@@ -24,6 +24,7 @@ class ConvCNPWeatherE2E(nn.Module):
         sf_model_path,
         return_gridded=False,
         aux_data_path=None,
+        data_path="../data/",
     ):
 
         super().__init__()
@@ -31,6 +32,7 @@ class ConvCNPWeatherE2E(nn.Module):
         self.device = device
         self.lead_time = lead_time
         self.return_gridded = return_gridded
+        self._data_path = data_path # only passed to the encoder?
 
         # Load encoder
         self.se_model = self.load_se_model(se_model_path)
@@ -95,11 +97,13 @@ class ConvCNPWeatherE2E(nn.Module):
             decoder=forecast_config["decoder"],
             mode=forecast_config["mode"],
             film=bool(0),
+            data_path=self._data_path,
         )
 
         best_epoch = np.argmin(np.load("{}/losses_0.npy".format(se_model_path)))
         state_dict = torch.load(
             "{}/epoch_{}".format(se_model_path, best_epoch),
+            weights_only=False,
             map_location="cuda",
         )["model_state_dict"]
         state_dict = {k[7:]: v for k, v in zip(state_dict.keys(), state_dict.values())}
@@ -125,9 +129,11 @@ class ConvCNPWeatherE2E(nn.Module):
             decoder=forecast_config["decoder"],
             mode=forecast_config["mode"],
             film=False,
+            data_path=self._data_path,
         )
         state_dict = torch.load(
             f"{forecast_model_path}/forecast_{lead_time}/epoch_0",
+            weights_only=False,
             map_location="cuda",
         )["model_state_dict"]
         state_dict = {k[7:]: v for k, v in zip(state_dict.keys(), state_dict.values())}
@@ -152,13 +158,16 @@ class ConvCNPWeatherE2E(nn.Module):
             decoder=config["decoder"],
             mode=config["mode"],
             film=False,
+            data_path=self._data_path,
         )
 
         best_epoch = np.argmin(
             np.load("{}/lt_{}/losses_0.npy".format(sf_model_path, lead_time))
         )
         full_state_dict = torch.load(
-            sf_model_path + f"/lt_{lead_time}/epoch_{best_epoch}", map_location="cuda"
+            sf_model_path + f"/lt_{lead_time}/epoch_{best_epoch}",
+            map_location="cuda",
+            weights_only=False,
         )
         state_dict = full_state_dict["model_state_dict"]
         state_dict = {k[7:]: v for k, v in zip(state_dict.keys(), state_dict.values())}
