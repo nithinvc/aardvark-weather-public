@@ -22,6 +22,8 @@ class WeatherDataset(Dataset):
         start_date,
         end_date,
         lead_time,
+        data_path,
+        aux_data_path,
         era5_mode="train",
         res=1,
         filter_dates=None,
@@ -33,8 +35,8 @@ class WeatherDataset(Dataset):
         # Setup
         self.device = device
         self.mode = hadisd_mode
-        self.data_path = "path_to_data/"
-        self.aux_data_path = "path_to_auxiliary_data/"
+        self.data_path = data_path
+        self.aux_data_path = aux_data_path
         self.start_date = start_date
         self.end_date = end_date
         self.lead_time = lead_time
@@ -1698,6 +1700,8 @@ class WeatherDatasetE2E(WeatherDataset):
         lead_time,
         mode,
         hadisd_var,
+        data_path,
+        aux_data_path,
         max_steps_per_epoch=None,
         era5_mode="sfc",
         res=1,
@@ -1715,6 +1719,8 @@ class WeatherDatasetE2E(WeatherDataset):
             start_date,
             end_date,
             lead_time,
+            data_path,
+            aux_data_path,
             era5_mode,
             res=res,
             filter_dates=filter_dates,

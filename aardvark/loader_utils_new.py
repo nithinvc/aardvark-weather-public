@@ -79,7 +79,6 @@ HADISD_OFFSETS = generate_offsets(
     date_list, pd.date_range("1950-01-01 00:00", "2021-12-31 18:00", freq="6H")
 )
 
-
 def lon_to_0_360(x):
     return (x + 360) % 360
 
